@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * @file
+ * The main Islandora Metadata Extras module file.
+ */
+
+/**
+ * Theme preprocess function.
+ */
+function islandora_checksum_audit_preprocess_islandora_default_edit(&$variables) {
+  if (TRUE) {
+    $variables['datastream_table']['header'][] = array('data' => t('Checksum audit'));
+    $islandora_object = $variables['islandora_object'];
+    $rows = $variables['datastream_table']['rows'];
+
+    foreach ($islandora_object as $ds) {
+      $checksum_data = array(
+        'class' => 'datastream-checksum-audit',
+        'data' => '<img src="/misc/watchdog-ok.png" /> (24 events)',
+        // 'data' => '<img src="/misc/watchdog-warning.png" />',
+      );
+      $checksums[] = $checksum_data;
+    }
+
+    for ($i = 0; $i < count($rows); $i++) {
+      $rows[$i][] = $checksums[$i];
+    }
+    $variables['datastream_table']['rows'] = $rows;
+  }
+}
