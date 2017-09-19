@@ -2,30 +2,49 @@
 
 /**
  * @file
- * The main Islandora Metadata Extras module file.
+ * The Islandora Checksum Audit module file.
  */
 
 /**
  * Theme preprocess function.
  */
 function islandora_checksum_audit_preprocess_islandora_default_edit(&$variables) {
-  if (TRUE) {
-    $variables['datastream_table']['header'][] = array('data' => t('Checksum audit'));
-    $islandora_object = $variables['islandora_object'];
-    $rows = $variables['datastream_table']['rows'];
+  module_load_include('inc', 'islandora_checksum_audit', 'includes/utilities');
 
-    foreach ($islandora_object as $ds) {
-      $checksum_data = array(
-        'class' => 'datastream-checksum-audit',
-        'data' => '<img src="/misc/watchdog-ok.png" /> (24 events)',
-        // 'data' => '<img src="/misc/watchdog-warning.png" />',
-      );
-      $checksums[] = $checksum_data;
+  $variables['datastream_table']['header'][] = array('data' => t('Checksum audit'));
+  $islandora_object = $variables['islandora_object'];
+  $rows = $variables['datastream_table']['rows'];
+
+  $foxml = islandora_checksum_audit_get_foxml($islandora_object->id);
+  $fixity_checks = islandora_checksum_audit_get_fixity_checks($foxml);
+
+  foreach ($islandora_object as $ds) {
+    $data = '';
+    if (isset($fixity_checks[$ds->id])) {
+      if (isset($fixity_checks[$ds->id]['valid'])) {
+        $num_valid_fixity_checks = count($fixity_checks[$ds->id]['valid']);
+        $data = '<img src="/misc/watchdog-ok.png" /> ( ' . $num_valid_fixity_checks . ' events)';
+      }
+      if (isset($fixity_checks[$ds->id]['invalid'])) {
+        $num_invalid_fixity_checks = count($fixity_checks[$ds->id]['invalid']);
+        $data .= '<br / ><img src="/misc/watchdog-warning.png" /> ( ' . $num_invalid_fixity_checks . ' events)';
+      }
+    }
+    else {
+      $num_fixity_checks = 0;
+      $data = '';
     }
 
-    for ($i = 0; $i < count($rows); $i++) {
-      $rows[$i][] = $checksums[$i];
-    }
-    $variables['datastream_table']['rows'] = $rows;
+    $checksum_data = array(
+      'class' => 'datastream-checksum-audit',
+      'data' => $data,
+    );
+
+    $checksums[] = $checksum_data;
   }
+
+  for ($i = 0; $i < count($rows); $i++) {
+    $rows[$i][] = $checksums[$i];
+  }
+  $variables['datastream_table']['rows'] = $rows;
 }

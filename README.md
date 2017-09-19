@@ -8,7 +8,13 @@ Utility module to that displays an overview of the checksum validation events fr
 
 ## Configuration and usage
 
-Maybe an option to show N latest events?
+This module does not have any configuration options. When it is enabled, an extra column will appear at the end of the datastream list at an objects Manage > Datastreams tab containing a count of the valid checksum validation events in the object's Audit datastream:
+
+![Valid checksum validation events](images/checksum_audit_valid_screencap.png)
+
+If any invalid (failed) events exist, they will also be indicated in this column:
+
+![Invalid checksum validation events](images/checksum_audit_invalid_screencap.png)
 
 ## Maintainer
 
