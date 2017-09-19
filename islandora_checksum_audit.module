@@ -23,11 +23,11 @@ function islandora_checksum_audit_preprocess_islandora_default_edit(&$variables)
     if (isset($fixity_checks[$ds->id])) {
       if (isset($fixity_checks[$ds->id]['valid'])) {
         $num_valid_fixity_checks = count($fixity_checks[$ds->id]['valid']);
-        $data = '<img src="/misc/watchdog-ok.png" /> ( ' . $num_valid_fixity_checks . ' events)';
+        $data = '<img src="/misc/watchdog-ok.png" /> (' . $num_valid_fixity_checks . ' events)';
       }
       if (isset($fixity_checks[$ds->id]['invalid'])) {
         $num_invalid_fixity_checks = count($fixity_checks[$ds->id]['invalid']);
-        $data .= '<br / ><img src="/misc/watchdog-warning.png" /> ( ' . $num_invalid_fixity_checks . ' events)';
+        $data .= '<br / ><img src="/misc/watchdog-warning.png" /> (' . $num_invalid_fixity_checks . ' events)';
       }
     }
     else {
