@@ -6,6 +6,92 @@
  */
 
 /**
+ * Implements hook_menu().
+ */
+function islandora_checksum_audit_menu() {
+  $items = array();
+  $items['islandora/object/%islandora_object/manage/checksum_audit_details/%'] = array(
+    'title callback' => 'islandora_checksum_audit_details_title',
+    'title arguments' => array(2, 5),
+    'page callback' => 'islandora_checksum_audit_details',
+    'access arguments' => array(ISLANDORA_METADATA_EDIT),
+    'type' => MENU_NORMAL_ITEM,
+    'page arguments' => array(2, 5),
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_admin_paths_alter().
+ */
+function islandora_checksum_audit_admin_paths_alter(&$paths) {
+  $paths['islandora/object/%islandora_object/manage/checksum_audit_details/%'] = TRUE;
+}
+
+/**
+ * Page callback.
+ *
+ * @param AbstractObject $islandora_object
+ *   The Islandora object.
+ * @param string $dsid
+ *   The datastream ID.
+ *
+ * @return string
+ *   The overlay page content.
+ */
+function islandora_checksum_audit_details(AbstractObject $islandora_object, $dsid) {
+  $dsid = trim($dsid);
+  module_load_include('inc', 'islandora_checksum_audit', 'includes/utilities');
+  $foxml = islandora_checksum_audit_get_foxml($islandora_object->id);
+  $fixity_checks = islandora_checksum_audit_get_fixity_checks($foxml);
+
+  $header = array(
+    'audit_id' => t('Audit record ID'),
+    'date' => t('Date'),
+    'event' => t('Event'),
+  );
+
+  $valid_subset = $fixity_checks[$dsid]['valid'];
+  $rows = array();
+  foreach ($valid_subset as $id => $details) {
+    $rows[] = array(
+      'audit_id' => $id,
+      'date' => $details['date'],
+      'event' => $details['event'],
+    );
+  }
+
+  if (isset($fixity_checks[$dsid]['invalid'])) {
+    $valid_subset = $fixity_checks[$dsid]['invalid'];
+    $rows = array();
+    foreach ($valid_subset as $id => $details) {
+      $rows[] = array(
+        'audit_id' => $id,
+        'date' => $details['date'],
+        'event' => $details['event'],
+      );
+    }
+  }
+
+  $output = '<h4>' . t('Successful validation events') . '</h4>';
+  $output .= theme('table', array('header' => $header, 'rows' => $rows));
+
+  if (isset($fixity_checks[$dsid]['invalid'])) {
+    $output .= '<h4>' . t('Failed validation events') . '</h4>';
+    $output .= theme('table', array('header' => $header, 'rows' => $rows));
+  }
+
+  return $output;
+}
+
+/**
+ * Page title callback function.
+ */
+function islandora_checksum_audit_details_title(AbstractObject $islandora_object, $dsid) {
+  return t('Checksum events for @pid / @dsid', array('@pid' => $islandora_object->id, '@dsid' => $dsid));
+}
+
+/**
  * Theme preprocess function.
  */
 function islandora_checksum_audit_preprocess_islandora_default_edit(&$variables) {
@@ -23,7 +109,8 @@ function islandora_checksum_audit_preprocess_islandora_default_edit(&$variables)
     if (isset($fixity_checks[$ds->id])) {
       if (isset($fixity_checks[$ds->id]['valid'])) {
         $num_valid_fixity_checks = count($fixity_checks[$ds->id]['valid']);
-        $data = '<img src="/misc/watchdog-ok.png" /> (' . $num_valid_fixity_checks . ' events)';
+        $link = l(t('events'), 'islandora/object/' . $islandora_object->id . '/manage/checksum_audit_details/' . $ds->id);
+        $data = '<img src="/misc/watchdog-ok.png" /> (' . $num_valid_fixity_checks . ' ' . $link . ')';
       }
       if (isset($fixity_checks[$ds->id]['invalid'])) {
         $num_invalid_fixity_checks = count($fixity_checks[$ds->id]['invalid']);
