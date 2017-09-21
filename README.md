@@ -16,7 +16,7 @@ If any invalid (failed) events exist, they will also be indicated in this column
 
 ![Invalid checksum validation events](images/checksum_audit_invalid_screencap.png)
 
-Clicking on the link will provide a list of all checksum validation events.
+Clicking on the 'events' link will provide a list of all checksum validation events.
 
 ## Maintainer
 
