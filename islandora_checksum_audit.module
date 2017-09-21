@@ -114,7 +114,8 @@ function islandora_checksum_audit_preprocess_islandora_default_edit(&$variables)
       }
       if (isset($fixity_checks[$ds->id]['invalid'])) {
         $num_invalid_fixity_checks = count($fixity_checks[$ds->id]['invalid']);
-        $data .= '<br / ><img src="/misc/watchdog-warning.png" /> (' . $num_invalid_fixity_checks . ' events)';
+        $link = l(t('events'), 'islandora/object/' . $islandora_object->id . '/manage/checksum_audit_details/' . $ds->id);
+        $data .= '<br /><img src="/misc/watchdog-warning.png" /> (' . $num_invalid_fixity_checks . ' ' . $link . ')';
       }
     }
     else {
