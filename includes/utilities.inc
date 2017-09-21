@@ -26,12 +26,13 @@ function islandora_checksum_audit_get_foxml($pid) {
   }
   catch (Exception $e) {
     drupal_set_message(t(
-        "Error retrieving FOXML required to fixity check data: '@message'",
-        array("@message" => $e->getMessage())));
-    watchdog_exception(
-      'islandora_checksum_audit',
-      $e,
-      'Error retrieving FOXML required to generate PREMIS: %type: !message in %function (line %line of %file).'
+        "Error retrieving FOXML required to fixity check data: @message",
+        array("@message" => $e->getMessage())), 'error');
+    watchdog(
+      "islandora_checksum_audit",
+      "Error retrieving FOXML for !pid required to fixity check data: @message",
+      array('!pid' => $pid, '@message' => $e->getMessage),
+      WATCHDOG_ERROR
     );
   }
 
