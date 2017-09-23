@@ -73,7 +73,7 @@ function islandora_checksum_audit_get_fixity_checks($foxml) {
           $fixity_checks[$dsid]['valid'][$id->nodeValue]['date'] = $date;
           $fixity_checks[$dsid]['valid'][$id->nodeValue]['event'] = $justification_details['event'];
         }
-        else {
+        elseif (strpos($justification_details['event'], 'Invalid')) {
           $fixity_checks[$dsid]['invalid'][$id->nodeValue]['date'] = $date;
           $fixity_checks[$dsid]['invalid'][$id->nodeValue]['event'] = $justification_details['event'];
         }

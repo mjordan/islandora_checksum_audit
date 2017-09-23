@@ -51,34 +51,39 @@ function islandora_checksum_audit_details(AbstractObject $islandora_object, $dsi
     'event' => t('Event'),
   );
 
-  $valid_subset = $fixity_checks[$dsid]['valid'];
-  $rows = array();
-  foreach ($valid_subset as $id => $details) {
-    $rows[] = array(
-      'audit_id' => $id,
-      'date' => $details['date'],
-      'event' => $details['event'],
-    );
-  }
-
-  if (isset($fixity_checks[$dsid]['invalid'])) {
-    $valid_subset = $fixity_checks[$dsid]['invalid'];
-    $rows = array();
-    foreach ($valid_subset as $id => $details) {
-      $rows[] = array(
-        'audit_id' => $id,
-        'date' => $details['date'],
-        'event' => $details['event'],
+  if (isset($fixity_checks[$dsid]['valid'])) {
+    $valid_subset = $fixity_checks[$dsid]['valid'];
+    $valid_rows = array();
+    foreach ($valid_subset as $valid_id => $valid_details) {
+      $valid_rows[] = array(
+        'audit_id' => $valid_id,
+        'date' => $valid_details['date'],
+        'event' => $valid_details['event'],
       );
     }
   }
 
-  $output = '<h4>' . t('Successful validation events') . '</h4>';
-  $output .= theme('table', array('header' => $header, 'rows' => $rows));
+  if (isset($fixity_checks[$dsid]['invalid'])) {
+    $invalid_subset = $fixity_checks[$dsid]['invalid'];
+    $invalid_rows = array();
+    foreach ($invalid_subset as $invalid_id => $invalid_details) {
+      $invalid_rows[] = array(
+        'audit_id' => $invalid_id,
+        'date' => $invalid_details['date'],
+        'event' => $invalid_details['event'],
+      );
+    }
+  }
+
+  $output = '';
+  if (isset($fixity_checks[$dsid]['valid'])) {
+    $output .= '<h4>' . t('Successful validation events') . '</h4>';
+    $output .= theme('table', array('header' => $header, 'rows' => $valid_rows));
+  }
 
   if (isset($fixity_checks[$dsid]['invalid'])) {
     $output .= '<h4>' . t('Failed validation events') . '</h4>';
-    $output .= theme('table', array('header' => $header, 'rows' => $rows));
+    $output .= theme('table', array('header' => $header, 'rows' => $invalid_rows));
   }
 
   return $output;
